@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 import matplotlib.pyplot as plt
-import ipywidgets as widgets
-from IPython.display import display
+import streamlit as st
 
 def bayes_theorem(prior, sensitivity, specificity):
     false_positive_rate = 1 - specificity
@@ -16,13 +14,13 @@ def update_plot(prior, sensitivity, specificity):
     posterior = bayes_theorem(prior, sensitivity, specificity)
     
     # Mostrar resultados
-    print("\nResults:")
-    print(f"Given a positive test result, the probability of actually having COVID-19 is: {posterior:.2%}")
-    print("\nExplanation:")
-    print(f"- Prevalence (Prior Probability): {prior:.2%}")
-    print(f"- Test Sensitivity: {sensitivity:.2%}")
-    print(f"- Test Specificity: {specificity:.2%}")
-    print(f"- False Positive Rate: {(1 - specificity):.2%}")
+    st.subheader("Results:")
+    st.write(f"Given a positive test result, the probability of actually having COVID-19 is: {posterior:.2%}")
+    st.subheader("Explanation:")
+    st.write(f"- Prevalence (Prior Probability): {prior:.2%}")
+    st.write(f"- Test Sensitivity: {sensitivity:.2%}")
+    st.write(f"- Test Specificity: {specificity:.2%}")
+    st.write(f"- False Positive Rate: {(1 - specificity):.2%}")
     
     # Sensitivity analysis
     sensitivities = np.linspace(0, 1, 50)
@@ -41,15 +39,12 @@ def update_plot(prior, sensitivity, specificity):
     plt.title("Effect of Sensitivity and Specificity on Posterior Probability")
     plt.legend()
     plt.grid()
-    plt.show()
+    st.pyplot(plt)
 
-# Sliders
-prior_slider = widgets.FloatSlider(min=0, max=1, step=0.01, value=0.01, description="Prevalence")
-sensitivity_slider = widgets.FloatSlider(min=0, max=1, step=0.01, value=0.95, description="Sensitivity")
-specificity_slider = widgets.FloatSlider(min=0, max=1, step=0.01, value=0.98, description="Specificity")
+# Streamlit UI
+st.title("COVID-19 Test Probability Calculator")
+prior = st.slider("Prevalence (Prior Probability)", 0.0, 1.0, 0.01, 0.01)
+sensitivity = st.slider("Test Sensitivity", 0.0, 1.0, 0.95, 0.01)
+specificity = st.slider("Test Specificity", 0.0, 1.0, 0.98, 0.01)
 
-# Interactive output
-ui = widgets.VBox([prior_slider, sensitivity_slider, specificity_slider])
-out = widgets.interactive_output(update_plot, {'prior': prior_slider, 'sensitivity': sensitivity_slider, 'specificity': specificity_slider})
-
-display(ui, out)
+update_plot(prior, sensitivity, specificity)
